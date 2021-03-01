@@ -1,0 +1,7 @@
+{
+    "DB_USERNAME" : "paldi",
+    "DB_PASSWORD" : "masihpemula",
+    "DB_PORT" : "3306",
+    "DB_HOST" : "192.168.20.221",
+    "DB_NAME" : "precise"
+}
