@@ -3,7 +3,7 @@ package db
 import (
 	"database/sql"
 
-	"github.com/febrarisupaldi/go-learning-api/config"
+	"github.com/febrarisupaldi/go-precise/config"
 	_ "github.com/go-sql-driver/mysql"
 )
 

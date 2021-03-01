@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/febrarisupaldi/go-learning-api/db"
-	"github.com/febrarisupaldi/go-learning-api/routes"
+	"github.com/febrarisupaldi/go-precise/db"
+	"github.com/febrarisupaldi/go-precise/routes"
 )
 
 func main() {

@@ -2,9 +2,8 @@ package models
 
 import (
 	"net/http"
-	"time"
 
-	"github.com/febrarisupaldi/go-learning-api/db"
+	"github.com/febrarisupaldi/go-precise/db"
 )
 
 type Country struct {
@@ -13,8 +12,8 @@ type Country struct {
 	Name    string `json:"country_name"`
 	CreatedOn string `json:"created_on"`
 	CreatedBy string `json:"created_by"`
-	UpdatedOn string `json:"updated_on"`
-	UpdatedBy string `json:"updated_by"`
+	UpdatedOn *string `json:"updated_on"`
+	UpdatedBy *string `json:"updated_by"`
 }
 
 func GetAllCountry() (Response, error) {
@@ -46,18 +45,17 @@ func GetAllCountry() (Response, error) {
 	return res, nil
 }
 
-func AddCustomers(customer_name string, customer_address string, customer_contact string) (Response, error) {
+func AddCountry(country_code string, country_name string, created_by string) (Response, error) {
 	var res Response
 	con := db.Conn()
-	time := time.Now()
-	sqlStatement := "insert into customers(customer_name, customer_address, customer_contact, created_at, sales_id) values(?,?,?,?,120)"
+	sqlStatement := "insert into precise.country(country_code, country_name, created_by) values(?,?,?)"
 	stmt, err := con.Prepare(sqlStatement)
 
 	if err != nil {
 		return res, err
 	}
 
-	result, err := stmt.Exec(customer_name, customer_address, customer_contact, time)
+	result, err := stmt.Exec(country_code, country_name, created_by)
 
 	if err != nil {
 		return res, err
@@ -71,6 +69,61 @@ func AddCustomers(customer_name string, customer_address string, customer_contac
 	res.Status = http.StatusOK
 	res.Message = "Success"
 	res.Data = map[string]int64{"id": getId}
+
+	return res, nil
+}
+
+func UpdateCountry(country_id int, country_code string, country_name string, updated_by string)(Response, error){
+	var res Response
+	con := db.Conn()
+	sqlStatement := "update precise.country set country_code = ?, country_name = ?, updated_by = ? where country_id = ?"
+	stmt, err := con.Prepare(sqlStatement)
+	if err != nil {
+		return res, err
+	}
+	
+	result, err := stmt.Exec(country_code, country_name, updated_by, country_id)
+	if err != nil {
+		return res, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return res, err
+	}
+
+	res.Status = http.StatusOK
+	res.Message = "Success"
+	res.Data = rowsAffected
+
+	return res, nil
+
+}
+
+func DeleteCountry(id int)(Response, error){
+	var res Response
+
+	con := db.Conn()
+	sqlStatement := "delete from precise.country where country_id = ?"
+
+	stmt, err := con.Prepare(sqlStatement)
+	if err != nil{
+		return res, err
+	}
+
+	result, err := stmt.Exec(id)
+	if err != nil{
+		return res, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil{
+		return res, err
+	}
+
+	res.Status = http.StatusOK
+	res.Message = "Success"
+	res.Data = rowsAffected
 
 	return res, nil
 }

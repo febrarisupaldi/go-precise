@@ -1,4 +1,4 @@
-module github.com/febrarisupaldi/go-learning-api
+module github.com/febrarisupaldi/go-precise
 
 go 1.16
 
