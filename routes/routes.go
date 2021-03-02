@@ -17,6 +17,7 @@ func Init() *echo.Echo {
 	e.POST("/country", controllers.AddCountry)
 	e.PUT("/country/:id", controllers.UpdateCountry)
 	e.DELETE("/country/:id", controllers.DeleteCountry)
-
+	e.POST("/login", controllers.Login)
+	//e.POST("/generate", controllers.GenerateHashPassword)
 	return e
 }
