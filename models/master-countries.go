@@ -2,11 +2,15 @@ package models
 
 import (
 	"net/http"
-
 	"github.com/febrarisupaldi/go-precise/db"
 )
 
 type Country struct {
+	Code	string `json:"country_code"`
+	Name    string `json:"country_name"`
+}
+
+type Countries struct{
 	Id      int    `json:"country_id"`
 	Code	string `json:"country_code"`
 	Name    string `json:"country_name"`
@@ -16,11 +20,11 @@ type Country struct {
 	UpdatedBy *string `json:"updated_by"`
 }
 
-func GetAllCountry() (Response, error) {
-	var obj Country
-	var arrobj []Country
+func AllCountry() (Response, error) {
+	var obj Countries
+	var arrobj []Countries
 	var res Response
-
+	db.Init()
 	con := db.Conn()
 
 	sqlStatement := `select country_id, country_code, country_name, created_on, created_by, updated_on, updated_by
@@ -45,12 +49,33 @@ func GetAllCountry() (Response, error) {
 	return res, nil
 }
 
+func ShowCountry(country_id int)(Country, error){
+	var obj Country
+	db.Init()
+	con := db.Conn()
+	sqlStatement := "select country_code, country_name from precise.country where country_id = ?"
+	err := con.QueryRow(sqlStatement, country_id).Scan(
+		&obj.Code, &obj.Name,
+	)
+
+	if err != nil {
+		return obj, err
+	}
+	
+	defer con.Close()
+
+	return obj, nil
+}
+
 func AddCountry(country_code string, country_name string, created_by string) (Response, error) {
 	var res Response
+	
+	db.Init()
 	con := db.Conn()
 	sqlStatement := "insert into precise.country(country_code, country_name, created_by) values(?,?,?)"
 	stmt, err := con.Prepare(sqlStatement)
-
+	defer con.Close()
+	
 	if err != nil {
 		return res, err
 	}
@@ -73,25 +98,54 @@ func AddCountry(country_code string, country_name string, created_by string) (Re
 	return res, nil
 }
 
-func UpdateCountry(country_id int, country_code string, country_name string, updated_by string)(Response, error){
+func UpdateCountry(country_id int, country_code string, country_name string, updated_by string, reason string)(Response, error){
 	var res Response
+	
+	db.Init()
 	con := db.Conn()
+	tx, err := con.Begin()
+	if err != nil {
+		tx.Rollback()
+		return res, err
+	}
+
 	sqlStatement := "update precise.country set country_code = ?, country_name = ?, updated_by = ? where country_id = ?"
 	stmt, err := con.Prepare(sqlStatement)
+	defer con.Close()
+
 	if err != nil {
+		tx.Rollback()
 		return res, err
 	}
 	
 	result, err := stmt.Exec(country_code, country_name, updated_by, country_id)
 	if err != nil {
+		tx.Rollback()
 		return res, err
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
+		tx.Rollback()
 		return res, err
 	}
 
+	sqlStatement = "set @username = ?, @reason = ?"
+	stmt, err = con.Prepare(sqlStatement)
+	//defer con.Close()
+
+	if err != nil {
+		tx.Rollback()
+		return res, err
+	}
+	
+	result, err = stmt.Exec(updated_by, reason)
+	if err != nil {
+		tx.Rollback()
+		return res, err
+	}
+
+	tx.Commit()
 	res.Status = http.StatusOK
 	res.Message = "Success"
 	res.Data = rowsAffected
@@ -100,30 +154,81 @@ func UpdateCountry(country_id int, country_code string, country_name string, upd
 
 }
 
-func DeleteCountry(id int)(Response, error){
+func DeleteCountry(id int, deleted_by string, reason string)(Response, error){
 	var res Response
 
+	db.Init()
 	con := db.Conn()
+	tx, err := con.Begin()
+	if err != nil {
+		tx.Rollback()
+		return res, err
+	}
 	sqlStatement := "delete from precise.country where country_id = ?"
+	defer con.Close()
 
 	stmt, err := con.Prepare(sqlStatement)
 	if err != nil{
+		tx.Rollback()
 		return res, err
 	}
 
 	result, err := stmt.Exec(id)
 	if err != nil{
+		tx.Rollback()
 		return res, err
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil{
+		tx.Rollback()
 		return res, err
 	}
+
+	sqlStatement = "set @username = ?, @reason = ?"
+	stmt, err = con.Prepare(sqlStatement)
+
+	if err != nil {
+		tx.Rollback()
+		return res, err
+	}
+	
+	result, err = stmt.Exec(deleted_by, reason)
+	if err != nil {
+		tx.Rollback()
+		return res, err
+	}
+
+	tx.Commit()
 
 	res.Status = http.StatusOK
 	res.Message = "Success"
 	res.Data = rowsAffected
 
 	return res, nil
+}
+
+func CheckCountry(tipe string, value string)(int, error){
+	var sqlStatement string
+	var rowCount int
+	db.Init()
+	con := db.Conn()
+
+	if tipe == "code"{
+		sqlStatement = "select count(*) from precise.country where country_code = ?"
+	}else if tipe == "name"{
+		sqlStatement = "select count(*) from precise.country where country_name = ?"
+	}
+	defer con.Close()
+
+	err := con.QueryRow(sqlStatement, value).Scan(
+		&rowCount,
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return rowCount, nil
+
 }

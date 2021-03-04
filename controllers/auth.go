@@ -40,7 +40,7 @@ func Login(c echo.Context) error{
 	time := time.Now().Add(time.Hour * 8).String()
 	return c.JSON(http.StatusOK, echo.Map{
 		"access_token":t,
-		"expires_in": time,
+		"expired_in": time,
 		"log_id" : logId,
 	})
 }
