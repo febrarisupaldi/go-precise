@@ -16,10 +16,11 @@ func Login(user_id, password string)(bool, int64, error){
 	var obj User
 	var pwd string
 
+	db.Init()
 	con := db.Conn()
 
 	sqlStatement := "select user_id, password from users where user_id = ?"
-
+	defer con.Close()
 	err := con.QueryRow(sqlStatement, user_id).Scan(
 		&obj.user_id, &pwd,
 	)

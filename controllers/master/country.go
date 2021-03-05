@@ -1,15 +1,15 @@
-package controllers
+package master
 
 import (
 	"strconv"
 	"net/http"
 
-	"github.com/febrarisupaldi/go-precise/models"
+	"github.com/febrarisupaldi/go-precise/models/master"
 	"github.com/labstack/echo/v4"
 )
 
 func AllCountry(c echo.Context) error {
-	result, err := models.AllCountry()
+	result, err := master.AllCountry()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
@@ -22,7 +22,7 @@ func ShowCountry(c echo.Context) error{
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
-	result, err := models.ShowCountry(id)
+	result, err := master.ShowCountry(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
@@ -35,7 +35,7 @@ func AddCountry(c echo.Context) error {
 	name := c.FormValue("country_name")
 	by := c.FormValue("created_by")
 
-	result, err := models.AddCountry(code, name, by)
+	result, err := master.AddCountry(code, name, by)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -52,7 +52,7 @@ func UpdateCountry(c echo.Context) error{
 	by := c.FormValue("updated_by")
 	reason := c.FormValue("reason")
 
-	result, err := models.UpdateCountry(id, code, name, by, reason)
+	result, err := master.UpdateCountry(id, code, name, by, reason)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -68,7 +68,7 @@ func DeleteCountry(c echo.Context) error{
 	by := c.FormValue("deleted_by")
 	reason := c.FormValue("reason")
 
-	result, err := models.DeleteCountry(id, by, reason)
+	result, err := master.DeleteCountry(id, by, reason)
 	if err != nil{
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -80,7 +80,7 @@ func CheckCountry(c echo.Context)error{
 	tipe := c.QueryParam("type")
 	value := c.QueryParam("value")
 
-	result, err := models.CheckCountry(tipe, value)
+	result, err := master.CheckCountry(tipe, value)
 	if err != nil{
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

@@ -45,8 +45,8 @@ func Login(c echo.Context) error{
 	})
 }
 
-func GenerateHashPassword(c echo.Context) error{
-	password := c.FormValue("password")
-	hash, _ := models.HashPassword(password)
-	return c.JSON(http.StatusOK, hash)
-}
+// func GenerateHashPassword(c echo.Context) error{
+// 	password := c.FormValue("password")
+// 	hash, _ := models.HashPassword(password)
+// 	return c.JSON(http.StatusOK, hash)
+// }

@@ -1,8 +1,9 @@
-package models
+package master
 
 import (
 	"net/http"
 	"github.com/febrarisupaldi/go-precise/db"
+	r "github.com/febrarisupaldi/go-precise/models"
 )
 
 type Country struct {
@@ -20,10 +21,10 @@ type Countries struct{
 	UpdatedBy *string `json:"updated_by"`
 }
 
-func AllCountry() (Response, error) {
+func AllCountry() (r.Response, error) {
 	var obj Countries
 	var arrobj []Countries
-	var res Response
+	var res r.Response
 	db.Init()
 	con := db.Conn()
 
@@ -57,18 +58,17 @@ func ShowCountry(country_id int)(Country, error){
 	err := con.QueryRow(sqlStatement, country_id).Scan(
 		&obj.Code, &obj.Name,
 	)
+	defer con.Close()
 
 	if err != nil {
 		return obj, err
 	}
 	
-	defer con.Close()
-
 	return obj, nil
 }
 
-func AddCountry(country_code string, country_name string, created_by string) (Response, error) {
-	var res Response
+func AddCountry(country_code string, country_name string, created_by string) (r.Response, error) {
+	var res r.Response
 	
 	db.Init()
 	con := db.Conn()
@@ -98,8 +98,8 @@ func AddCountry(country_code string, country_name string, created_by string) (Re
 	return res, nil
 }
 
-func UpdateCountry(country_id int, country_code string, country_name string, updated_by string, reason string)(Response, error){
-	var res Response
+func UpdateCountry(country_id int, country_code string, country_name string, updated_by string, reason string)(r.Response, error){
+	var res r.Response
 	
 	db.Init()
 	con := db.Conn()
@@ -154,8 +154,8 @@ func UpdateCountry(country_id int, country_code string, country_name string, upd
 
 }
 
-func DeleteCountry(id int, deleted_by string, reason string)(Response, error){
-	var res Response
+func DeleteCountry(id int, deleted_by string, reason string)(r.Response, error){
+	var res r.Response
 
 	db.Init()
 	con := db.Conn()
