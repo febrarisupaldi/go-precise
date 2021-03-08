@@ -21,7 +21,7 @@ type Countries struct{
 	UpdatedBy *string `json:"updated_by"`
 }
 
-func AllCountry() (r.Response, error) {
+func AllCountries() (r.Response, error) {
 	var obj Countries
 	var arrobj []Countries
 	var res r.Response

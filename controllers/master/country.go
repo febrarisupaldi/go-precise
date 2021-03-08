@@ -8,8 +8,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func AllCountry(c echo.Context) error {
-	result, err := master.AllCountry()
+func AllCountries(c echo.Context) error {
+	result, err := master.AllCountries()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}

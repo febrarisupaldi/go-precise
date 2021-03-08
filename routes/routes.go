@@ -18,7 +18,7 @@ func Init() *echo.Echo {
 	e.POST("/login", controllers.Login)
 	
 	m := e.Group("/master")
-	m.GET("/country", master.AllCountry, mw.IsAuthenticated)
+	m.GET("/country", master.AllCountries, mw.IsAuthenticated)
 	m.GET("/country/check", master.CheckCountry, mw.IsAuthenticated)
 	m.GET("/country/:id", master.ShowCountry, mw.IsAuthenticated)
 	m.POST("/country", master.AddCountry, mw.IsAuthenticated)
@@ -27,6 +27,7 @@ func Init() *echo.Echo {
 
 	o:= e.Group("/oem")
 	o.GET("/material-customer", oem.AllMaterialCustomer, mw.IsAuthenticated)
+	o.GET("/material-customer/:id", oem.ShowMaterialCustomer, mw.IsAuthenticated)
 	
 	//e.POST("/generate", controllers.GenerateHashPassword)
 	return e
